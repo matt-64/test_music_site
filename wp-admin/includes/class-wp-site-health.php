@@ -381,9 +381,10 @@ class WP_Site_Health {
 		$plugins        = get_plugins();
 		$plugin_updates = get_plugin_updates();
 
-		$plugins_active      = 0;
-		$plugins_total       = 0;
-		$plugins_need_update = 0;
+		$plugins_have_updates = false;
+		$plugins_active       = 0;
+		$plugins_total        = 0;
+		$plugins_need_update  = 0;
 
 		// Loop over the available plugins and check their versions and active state.
 		foreach ( $plugins as $plugin_path => $plugin ) {
@@ -393,8 +394,11 @@ class WP_Site_Health {
 				$plugins_active++;
 			}
 
+			$plugin_version = $plugin['Version'];
+
 			if ( array_key_exists( $plugin_path, $plugin_updates ) ) {
 				$plugins_need_update++;
+				$plugins_have_updates = true;
 			}
 		}
 
@@ -428,7 +432,7 @@ class WP_Site_Health {
 					'<p>%s</p>',
 					__( 'Your site has 1 active plugin, and it is up to date.' )
 				);
-			} elseif ( $plugins_active > 0 ) {
+			} else {
 				$result['description'] .= sprintf(
 					'<p>%s</p>',
 					sprintf(
@@ -440,11 +444,6 @@ class WP_Site_Health {
 						),
 						$plugins_active
 					)
-				);
-			} else {
-				$result['description'] .= sprintf(
-					'<p>%s</p>',
-					__( 'Your site does not have any active plugins.' )
 				);
 			}
 		}
@@ -596,7 +595,7 @@ class WP_Site_Health {
 					'<p>%s</p>',
 					__( 'Your site has 1 installed theme, and it is up to date.' )
 				);
-			} elseif ( $themes_total > 0 ) {
+			} else {
 				$result['description'] .= sprintf(
 					'<p>%s</p>',
 					sprintf(
@@ -608,11 +607,6 @@ class WP_Site_Health {
 						),
 						$themes_total
 					)
-				);
-			} else {
-				$result['description'] .= sprintf(
-					'<p>%s</p>',
-					__( 'Your site does not have any installed themes.' )
 				);
 			}
 		}

@@ -134,11 +134,11 @@ function wp_authenticate_username_password( $user, $username, $password ) {
 		$error = new WP_Error();
 
 		if ( empty( $username ) ) {
-			$error->add( 'empty_username', __( '<strong>Error:</strong> The username field is empty.' ) );
+			$error->add( 'empty_username', __( '<strong>Error</strong>: The username field is empty.' ) );
 		}
 
 		if ( empty( $password ) ) {
-			$error->add( 'empty_password', __( '<strong>Error:</strong> The password field is empty.' ) );
+			$error->add( 'empty_password', __( '<strong>Error</strong>: The password field is empty.' ) );
 		}
 
 		return $error;
@@ -151,7 +151,7 @@ function wp_authenticate_username_password( $user, $username, $password ) {
 			'invalid_username',
 			sprintf(
 				/* translators: %s: User name. */
-				__( '<strong>Error:</strong> The username <strong>%s</strong> is not registered on this site. If you are unsure of your username, try your email address instead.' ),
+				__( '<strong>Error</strong>: The username <strong>%s</strong> is not registered on this site. If you are unsure of your username, try your email address instead.' ),
 				$username
 			)
 		);
@@ -176,7 +176,7 @@ function wp_authenticate_username_password( $user, $username, $password ) {
 			'incorrect_password',
 			sprintf(
 				/* translators: %s: User name. */
-				__( '<strong>Error:</strong> The password you entered for the username %s is incorrect.' ),
+				__( '<strong>Error</strong>: The password you entered for the username %s is incorrect.' ),
 				'<strong>' . $username . '</strong>'
 			) .
 			' <a href="' . wp_lostpassword_url() . '">' .
@@ -213,11 +213,11 @@ function wp_authenticate_email_password( $user, $email, $password ) {
 
 		if ( empty( $email ) ) {
 			// Uses 'empty_username' for back-compat with wp_signon().
-			$error->add( 'empty_username', __( '<strong>Error:</strong> The email field is empty.' ) );
+			$error->add( 'empty_username', __( '<strong>Error</strong>: The email field is empty.' ) );
 		}
 
 		if ( empty( $password ) ) {
-			$error->add( 'empty_password', __( '<strong>Error:</strong> The password field is empty.' ) );
+			$error->add( 'empty_password', __( '<strong>Error</strong>: The password field is empty.' ) );
 		}
 
 		return $error;
@@ -248,7 +248,7 @@ function wp_authenticate_email_password( $user, $email, $password ) {
 			'incorrect_password',
 			sprintf(
 				/* translators: %s: Email address. */
-				__( '<strong>Error:</strong> The password you entered for the email address %s is incorrect.' ),
+				__( '<strong>Error</strong>: The password you entered for the email address %s is incorrect.' ),
 				'<strong>' . $email . '</strong>'
 			) .
 			' <a href="' . wp_lostpassword_url() . '">' .
@@ -351,12 +351,12 @@ function wp_authenticate_application_password( $input_user, $username, $password
 		if ( is_email( $username ) ) {
 			$error = new WP_Error(
 				'invalid_email',
-				__( '<strong>Error:</strong> Unknown email address. Check again or try your username.' )
+				__( '<strong>Error</strong>: Unknown email address. Check again or try your username.' )
 			);
 		} else {
 			$error = new WP_Error(
 				'invalid_username',
-				__( '<strong>Error:</strong> Unknown username. Check again or try your email address.' )
+				__( '<strong>Error</strong>: Unknown username. Check again or try your email address.' )
 			);
 		}
 	} elseif ( ! wp_is_application_passwords_available() ) {
@@ -503,7 +503,7 @@ function wp_authenticate_spam_check( $user ) {
 		$spammed = apply_filters( 'check_is_user_spammed', is_user_spammy( $user ), $user );
 
 		if ( $spammed ) {
-			return new WP_Error( 'spammer_account', __( '<strong>Error:</strong> Your account has been marked as a spammer.' ) );
+			return new WP_Error( 'spammer_account', __( '<strong>Error</strong>: Your account has been marked as a spammer.' ) );
 		}
 	}
 	return $user;
@@ -827,12 +827,7 @@ function wp_list_users( $args = array() ) {
 		}
 
 		if ( $args['show_fullname'] && '' !== $user->first_name && '' !== $user->last_name ) {
-			$name = sprintf(
-				/* translators: 1: User's first name, 2: Last name. */
-				_x( '%1$s %2$s', 'Display name based on first name and last name' ),
-				$user->first_name,
-				$user->last_name
-			);
+			$name = "$user->first_name $user->last_name";
 		} else {
 			$name = $user->display_name;
 		}
@@ -1850,11 +1845,8 @@ function update_user_caches( $user ) {
 
 	wp_cache_add( $user->ID, $user, 'users' );
 	wp_cache_add( $user->user_login, $user->ID, 'userlogins' );
+	wp_cache_add( $user->user_email, $user->ID, 'useremail' );
 	wp_cache_add( $user->user_nicename, $user->ID, 'userslugs' );
-
-	if ( ! empty( $user->user_email ) ) {
-		wp_cache_add( $user->user_email, $user->ID, 'useremail' );
-	}
 }
 
 /**
@@ -1862,15 +1854,10 @@ function update_user_caches( $user ) {
  *
  * @since 3.0.0
  * @since 4.4.0 'clean_user_cache' action was added.
- * @since 5.8.0 Refreshes the global user instance if cleaning the user cache for the current user.
- *
- * @global WP_User $current_user The current user object which holds the user data.
  *
  * @param WP_User|int $user User object or ID to be cleaned from the cache
  */
 function clean_user_cache( $user ) {
-	global $current_user;
-
 	if ( is_numeric( $user ) ) {
 		$user = new WP_User( $user );
 	}
@@ -1881,11 +1868,8 @@ function clean_user_cache( $user ) {
 
 	wp_cache_delete( $user->ID, 'users' );
 	wp_cache_delete( $user->user_login, 'userlogins' );
+	wp_cache_delete( $user->user_email, 'useremail' );
 	wp_cache_delete( $user->user_nicename, 'userslugs' );
-
-	if ( ! empty( $user->user_email ) ) {
-		wp_cache_delete( $user->user_email, 'useremail' );
-	}
 
 	/**
 	 * Fires immediately after the given user's cache is cleaned.
@@ -1896,13 +1880,6 @@ function clean_user_cache( $user ) {
 	 * @param WP_User $user    User object.
 	 */
 	do_action( 'clean_user_cache', $user->ID, $user );
-
-	// Refresh the global user instance if the cleaning current user.
-	if ( get_current_user_id() === (int) $user->ID ) {
-		$user_id      = (int) $user->ID;
-		$current_user = null;
-		wp_set_current_user( $user_id, '' );
-	}
 }
 
 /**
@@ -2253,12 +2230,8 @@ function wp_insert_user( $userdata ) {
 		if ( $update ) {
 			$display_name = $user_login;
 		} elseif ( $meta['first_name'] && $meta['last_name'] ) {
-			$display_name = sprintf(
-				/* translators: 1: User's first name, 2: Last name. */
-				_x( '%1$s %2$s', 'Display name based on first name and last name' ),
-				$meta['first_name'],
-				$meta['last_name']
-			);
+			/* translators: 1: User's first name, 2: Last name. */
+			$display_name = sprintf( _x( '%1$s %2$s', 'Display name based on first name and last name' ), $meta['first_name'], $meta['last_name'] );
 		} elseif ( $meta['first_name'] ) {
 			$display_name = $meta['first_name'];
 		} elseif ( $meta['last_name'] ) {
@@ -2845,7 +2818,7 @@ function get_password_reset_key( $user ) {
 	global $wp_hasher;
 
 	if ( ! ( $user instanceof WP_User ) ) {
-		return new WP_Error( 'invalidcombo', __( '<strong>Error:</strong> There is no account with that username or email address.' ) );
+		return new WP_Error( 'invalidcombo', __( '<strong>Error</strong>: There is no account with that username or email address.' ) );
 	}
 
 	/**
@@ -3040,11 +3013,11 @@ function retrieve_password( $user_login = null ) {
 	}
 
 	if ( empty( $user_login ) ) {
-		$errors->add( 'empty_username', __( '<strong>Error:</strong> Please enter a username or email address.' ) );
+		$errors->add( 'empty_username', __( '<strong>Error</strong>: Please enter a username or email address.' ) );
 	} elseif ( strpos( $user_login, '@' ) ) {
 		$user_data = get_user_by( 'email', trim( wp_unslash( $user_login ) ) );
 		if ( empty( $user_data ) ) {
-			$errors->add( 'invalid_email', __( '<strong>Error:</strong> There is no account with that username or email address.' ) );
+			$errors->add( 'invalid_email', __( '<strong>Error</strong>: There is no account with that username or email address.' ) );
 		}
 	} else {
 		$user_data = get_user_by( 'login', trim( wp_unslash( $user_login ) ) );
@@ -3098,7 +3071,7 @@ function retrieve_password( $user_login = null ) {
 	}
 
 	if ( ! $user_data ) {
-		$errors->add( 'invalidcombo', __( '<strong>Error:</strong> There is no account with that username or email address.' ) );
+		$errors->add( 'invalidcombo', __( '<strong>Error</strong>: There is no account with that username or email address.' ) );
 		return $errors;
 	}
 
@@ -3246,7 +3219,7 @@ function retrieve_password( $user_login = null ) {
 			'retrieve_password_email_failure',
 			sprintf(
 				/* translators: %s: Documentation URL. */
-				__( '<strong>Error:</strong> The email could not be sent. Your site may not be correctly configured to send emails. <a href="%s">Get support for resetting your password</a>.' ),
+				__( '<strong>Error</strong>: The email could not be sent. Your site may not be correctly configured to send emails. <a href="%s">Get support for resetting your password</a>.' ),
 				esc_url( __( 'https://wordpress.org/support/article/resetting-your-password/' ) )
 			)
 		);
@@ -3313,26 +3286,26 @@ function register_new_user( $user_login, $user_email ) {
 
 	// Check the username.
 	if ( '' === $sanitized_user_login ) {
-		$errors->add( 'empty_username', __( '<strong>Error:</strong> Please enter a username.' ) );
+		$errors->add( 'empty_username', __( '<strong>Error</strong>: Please enter a username.' ) );
 	} elseif ( ! validate_username( $user_login ) ) {
-		$errors->add( 'invalid_username', __( '<strong>Error:</strong> This username is invalid because it uses illegal characters. Please enter a valid username.' ) );
+		$errors->add( 'invalid_username', __( '<strong>Error</strong>: This username is invalid because it uses illegal characters. Please enter a valid username.' ) );
 		$sanitized_user_login = '';
 	} elseif ( username_exists( $sanitized_user_login ) ) {
-		$errors->add( 'username_exists', __( '<strong>Error:</strong> This username is already registered. Please choose another one.' ) );
+		$errors->add( 'username_exists', __( '<strong>Error</strong>: This username is already registered. Please choose another one.' ) );
 
 	} else {
 		/** This filter is documented in wp-includes/user.php */
 		$illegal_user_logins = (array) apply_filters( 'illegal_user_logins', array() );
 		if ( in_array( strtolower( $sanitized_user_login ), array_map( 'strtolower', $illegal_user_logins ), true ) ) {
-			$errors->add( 'invalid_username', __( '<strong>Error:</strong> Sorry, that username is not allowed.' ) );
+			$errors->add( 'invalid_username', __( '<strong>Error</strong>: Sorry, that username is not allowed.' ) );
 		}
 	}
 
 	// Check the email address.
 	if ( '' === $user_email ) {
-		$errors->add( 'empty_email', __( '<strong>Error:</strong> Please type your email address.' ) );
+		$errors->add( 'empty_email', __( '<strong>Error</strong>: Please type your email address.' ) );
 	} elseif ( ! is_email( $user_email ) ) {
-		$errors->add( 'invalid_email', __( '<strong>Error:</strong> The email address is not correct.' ) );
+		$errors->add( 'invalid_email', __( '<strong>Error</strong>: The email address is not correct.' ) );
 		$user_email = '';
 	} elseif ( email_exists( $user_email ) ) {
 		$errors->add(
@@ -3387,7 +3360,7 @@ function register_new_user( $user_login, $user_email ) {
 			'registerfail',
 			sprintf(
 				/* translators: %s: Admin email address. */
-				__( '<strong>Error:</strong> Could not register you&hellip; please contact the <a href="mailto:%s">site admin</a>!' ),
+				__( '<strong>Error</strong>: Could not register you&hellip; please contact the <a href="mailto:%s">site admin</a>!' ),
 				get_option( 'admin_email' )
 			)
 		);
@@ -3630,7 +3603,7 @@ function send_confirmation_on_profile_email() {
 		if ( ! is_email( $_POST['email'] ) ) {
 			$errors->add(
 				'user_email',
-				__( '<strong>Error:</strong> The email address is not correct.' ),
+				__( '<strong>Error</strong>: The email address is not correct.' ),
 				array(
 					'form-field' => 'email',
 				)
@@ -3642,7 +3615,7 @@ function send_confirmation_on_profile_email() {
 		if ( email_exists( $_POST['email'] ) ) {
 			$errors->add(
 				'user_email',
-				__( '<strong>Error:</strong> The email address is already used.' ),
+				__( '<strong>Error</strong>: The email address is already used.' ),
 				array(
 					'form-field' => 'email',
 				)
@@ -4173,8 +4146,8 @@ All at ###SITENAME###
 	$content = str_replace( '###SITENAME###', $email_data['sitename'], $content );
 	$content = str_replace( '###USER_EMAIL###', $email_data['user_email'], $content );
 	$content = str_replace( '###DESCRIPTION###', $email_data['description'], $content );
-	$content = str_replace( '###MANAGE_URL###', sanitize_url( $email_data['manage_url'] ), $content );
-	$content = str_replace( '###SITEURL###', sanitize_url( $email_data['siteurl'] ), $content );
+	$content = str_replace( '###MANAGE_URL###', esc_url_raw( $email_data['manage_url'] ), $content );
+	$content = str_replace( '###SITEURL###', esc_url_raw( $email_data['siteurl'] ), $content );
 
 	$headers = '';
 
@@ -4414,7 +4387,7 @@ All at ###SITENAME###
 
 	$content = str_replace( '###SITENAME###', $email_data['sitename'], $content );
 	$content = str_replace( '###PRIVACY_POLICY_URL###', $email_data['privacy_policy_url'], $content );
-	$content = str_replace( '###SITEURL###', sanitize_url( $email_data['siteurl'] ), $content );
+	$content = str_replace( '###SITEURL###', esc_url_raw( $email_data['siteurl'] ), $content );
 
 	$headers = '';
 
@@ -4735,10 +4708,10 @@ All at ###SITENAME###
 	$content = apply_filters( 'user_request_action_email_content', $content, $email_data );
 
 	$content = str_replace( '###DESCRIPTION###', $email_data['description'], $content );
-	$content = str_replace( '###CONFIRM_URL###', sanitize_url( $email_data['confirm_url'] ), $content );
+	$content = str_replace( '###CONFIRM_URL###', esc_url_raw( $email_data['confirm_url'] ), $content );
 	$content = str_replace( '###EMAIL###', $email_data['email'], $content );
 	$content = str_replace( '###SITENAME###', $email_data['sitename'], $content );
-	$content = str_replace( '###SITEURL###', sanitize_url( $email_data['siteurl'] ), $content );
+	$content = str_replace( '###SITEURL###', esc_url_raw( $email_data['siteurl'] ), $content );
 
 	$headers = '';
 

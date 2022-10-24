@@ -2041,7 +2041,7 @@ function get_link( $bookmark_id, $output = OBJECT, $filter = 'raw' ) {
  */
 function clean_url( $url, $protocols = null, $context = 'display' ) {
 	if ( $context == 'db' )
-		_deprecated_function( 'clean_url( $context = \'db\' )', '3.0.0', 'sanitize_url()' );
+		_deprecated_function( 'clean_url( $context = \'db\' )', '3.0.0', 'esc_url_raw()' );
 	else
 		_deprecated_function( __FUNCTION__, '3.0.0', 'esc_url()' );
 	return esc_url( $url, $protocols, $context );
@@ -3631,13 +3631,13 @@ function wp_htmledit_pre($output) {
  * @deprecated 4.4.0 Use get_permalink()
  * @see get_permalink()
  *
- * @param int|WP_Post $post Optional. Post ID or WP_Post object. Default is global $post.
+ * @param int|WP_Post $post_id Optional. Post ID or WP_Post object. Default is global $post.
  * @return string|false
  */
-function post_permalink( $post = 0 ) {
+function post_permalink( $post_id = 0 ) {
 	_deprecated_function( __FUNCTION__, '4.4.0', 'get_permalink()' );
 
-	return get_permalink( $post );
+	return get_permalink( $post_id );
 }
 
 /**
@@ -4313,50 +4313,18 @@ function wp_add_iframed_editor_assets_html() {
 }
 
 /**
- * Retrieves thumbnail for an attachment.
- * Note that this works only for the (very) old image metadata style where 'thumb' was set,
- * and the 'sizes' array did not exist. This function returns false for the newer image metadata style
- * despite that 'thumbnail' is present in the 'sizes' array.
+ * Filter the SQL clauses of an attachment query to include filenames.
  *
- * @since 2.1.0
- * @deprecated 6.1.0
+ * @since 4.7.0
+ * @deprecated 6.0.3
+ * @access private
  *
- * @param int $post_id Optional. Attachment ID. Default is the ID of the global `$post`.
- * @return string|false Thumbnail file path on success, false on failure.
+ * @param array $clauses An array including WHERE, GROUP BY, JOIN, ORDER BY,
+ *                       DISTINCT, fields (SELECT), and LIMITS clauses.
+ * @return array The unmodified clauses.
  */
-function wp_get_attachment_thumb_file( $post_id = 0 ) {
-	_deprecated_function( __FUNCTION__, '6.1.0' );
-
-	$post_id = (int) $post_id;
-	$post    = get_post( $post_id );
-
-	if ( ! $post ) {
-		return false;
-	}
-
-	// Use $post->ID rather than $post_id as get_post() may have used the global $post object.
-	$imagedata = wp_get_attachment_metadata( $post->ID );
-
-	if ( ! is_array( $imagedata ) ) {
-		return false;
-	}
-
-	$file = get_attached_file( $post->ID );
-
-	if ( ! empty( $imagedata['thumb'] ) ) {
-		$thumbfile = str_replace( wp_basename( $file ), $imagedata['thumb'], $file );
-		if ( file_exists( $thumbfile ) ) {
-			/**
-			 * Filters the attachment thumbnail file path.
-			 *
-			 * @since 2.1.0
-			 *
-			 * @param string $thumbfile File path to the attachment thumbnail.
-			 * @param int    $post_id   Attachment ID.
-			 */
-			return apply_filters( 'wp_get_attachment_thumb_file', $thumbfile, $post->ID );
-		}
-	}
-
-	return false;
+function _filter_query_attachment_filenames( $clauses ) {
+	_deprecated_function( __FUNCTION__, '4.9.9', 'add_filter( "wp_allow_query_attachment_by_filename", "__return_true" )' );
+	remove_filter( 'posts_clauses', __FUNCTION__ );
+	return $clauses;
 }

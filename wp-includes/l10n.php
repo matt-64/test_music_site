@@ -88,31 +88,29 @@ function get_locale() {
  *
  * @since 4.7.0
  *
- * @param int|WP_User $user User's ID or a WP_User object. Defaults to current user.
+ * @param int|WP_User $user_id User's ID or a WP_User object. Defaults to current user.
  * @return string The locale of the user.
  */
-function get_user_locale( $user = 0 ) {
-	$user_object = false;
-
-	if ( 0 === $user && function_exists( 'wp_get_current_user' ) ) {
-		$user_object = wp_get_current_user();
-	} elseif ( $user instanceof WP_User ) {
-		$user_object = $user;
-	} elseif ( $user && is_numeric( $user ) ) {
-		$user_object = get_user_by( 'id', $user );
+function get_user_locale( $user_id = 0 ) {
+	$user = false;
+	if ( 0 === $user_id && function_exists( 'wp_get_current_user' ) ) {
+		$user = wp_get_current_user();
+	} elseif ( $user_id instanceof WP_User ) {
+		$user = $user_id;
+	} elseif ( $user_id && is_numeric( $user_id ) ) {
+		$user = get_user_by( 'id', $user_id );
 	}
 
-	if ( ! $user_object ) {
+	if ( ! $user ) {
 		return get_locale();
 	}
 
-	$locale = $user_object->locale;
-
+	$locale = $user->locale;
 	return $locale ? $locale : get_locale();
 }
 
 /**
- * Determines the current locale desired for the request.
+ * Determine the current locale desired for the request.
  *
  * @since 5.0.0
  *
@@ -169,7 +167,7 @@ function determine_locale() {
 }
 
 /**
- * Retrieves the translation of $text.
+ * Retrieve the translation of $text.
  *
  * If there is no translation, or the text domain isn't loaded, the original text is returned.
  *
@@ -215,7 +213,7 @@ function translate( $text, $domain = 'default' ) {
 }
 
 /**
- * Removes last item on a pipe-delimited string.
+ * Remove last item on a pipe-delimited string.
  *
  * Meant for removing the last item in a string, such as 'Role name|User role'. The original
  * string will be returned if no pipe '|' characters are found in the string.
@@ -235,7 +233,7 @@ function before_last_bar( $string ) {
 }
 
 /**
- * Retrieves the translation of $text in the context defined in $context.
+ * Retrieve the translation of $text in the context defined in $context.
  *
  * If there is no translation, or the text domain isn't loaded, the original text is returned.
  *
@@ -284,7 +282,7 @@ function translate_with_gettext_context( $text, $context, $domain = 'default' ) 
 }
 
 /**
- * Retrieves the translation of $text.
+ * Retrieve the translation of $text.
  *
  * If there is no translation, or the text domain isn't loaded, the original text is returned.
  *
@@ -300,7 +298,7 @@ function __( $text, $domain = 'default' ) {
 }
 
 /**
- * Retrieves the translation of $text and escapes it for safe use in an attribute.
+ * Retrieve the translation of $text and escapes it for safe use in an attribute.
  *
  * If there is no translation, or the text domain isn't loaded, the original text is returned.
  *
@@ -316,7 +314,7 @@ function esc_attr__( $text, $domain = 'default' ) {
 }
 
 /**
- * Retrieves the translation of $text and escapes it for safe use in HTML output.
+ * Retrieve the translation of $text and escapes it for safe use in HTML output.
  *
  * If there is no translation, or the text domain isn't loaded, the original text
  * is escaped and returned.
@@ -333,7 +331,7 @@ function esc_html__( $text, $domain = 'default' ) {
 }
 
 /**
- * Displays translated text.
+ * Display translated text.
  *
  * @since 1.2.0
  *
@@ -346,7 +344,7 @@ function _e( $text, $domain = 'default' ) {
 }
 
 /**
- * Displays translated text that has been escaped for safe use in an attribute.
+ * Display translated text that has been escaped for safe use in an attribute.
  *
  * Encodes `< > & " '` (less than, greater than, ampersand, double quote, single quote).
  * Will never double encode entities.
@@ -364,7 +362,7 @@ function esc_attr_e( $text, $domain = 'default' ) {
 }
 
 /**
- * Displays translated text that has been escaped for safe use in HTML output.
+ * Display translated text that has been escaped for safe use in HTML output.
  *
  * If there is no translation, or the text domain isn't loaded, the original text
  * is escaped and displayed.
@@ -382,7 +380,7 @@ function esc_html_e( $text, $domain = 'default' ) {
 }
 
 /**
- * Retrieves translated string with gettext context.
+ * Retrieve translated string with gettext context.
  *
  * Quite a few times, there will be collisions with similar translatable text
  * found in more than two places, but with different translated context.
@@ -403,7 +401,7 @@ function _x( $text, $context, $domain = 'default' ) {
 }
 
 /**
- * Displays translated string with gettext context.
+ * Display translated string with gettext context.
  *
  * @since 3.0.0
  *
@@ -417,7 +415,7 @@ function _ex( $text, $context, $domain = 'default' ) {
 }
 
 /**
- * Translates string with gettext context, and escapes it for safe use in an attribute.
+ * Translate string with gettext context, and escapes it for safe use in an attribute.
  *
  * If there is no translation, or the text domain isn't loaded, the original text
  * is escaped and returned.
@@ -435,7 +433,7 @@ function esc_attr_x( $text, $context, $domain = 'default' ) {
 }
 
 /**
- * Translates string with gettext context, and escapes it for safe use in HTML output.
+ * Translate string with gettext context, and escapes it for safe use in HTML output.
  *
  * If there is no translation, or the text domain isn't loaded, the original text
  * is escaped and returned.
@@ -484,7 +482,7 @@ function _n( $single, $plural, $number, $domain = 'default' ) {
 	 * @param string $translation Translated text.
 	 * @param string $single      The text to be used if the number is singular.
 	 * @param string $plural      The text to be used if the number is plural.
-	 * @param int    $number      The number to compare against to use either the singular or plural form.
+	 * @param string $number      The number to compare against to use either the singular or plural form.
 	 * @param string $domain      Text domain. Unique identifier for retrieving translated strings.
 	 */
 	$translation = apply_filters( 'ngettext', $translation, $single, $plural, $number, $domain );
@@ -499,7 +497,7 @@ function _n( $single, $plural, $number, $domain = 'default' ) {
 	 * @param string $translation Translated text.
 	 * @param string $single      The text to be used if the number is singular.
 	 * @param string $plural      The text to be used if the number is plural.
-	 * @param int    $number      The number to compare against to use either the singular or plural form.
+	 * @param string $number      The number to compare against to use either the singular or plural form.
 	 * @param string $domain      Text domain. Unique identifier for retrieving translated strings.
 	 */
 	$translation = apply_filters( "ngettext_{$domain}", $translation, $single, $plural, $number, $domain );
@@ -543,7 +541,7 @@ function _nx( $single, $plural, $number, $context, $domain = 'default' ) {
 	 * @param string $translation Translated text.
 	 * @param string $single      The text to be used if the number is singular.
 	 * @param string $plural      The text to be used if the number is plural.
-	 * @param int    $number      The number to compare against to use either the singular or plural form.
+	 * @param string $number      The number to compare against to use either the singular or plural form.
 	 * @param string $context     Context information for the translators.
 	 * @param string $domain      Text domain. Unique identifier for retrieving translated strings.
 	 */
@@ -559,7 +557,7 @@ function _nx( $single, $plural, $number, $context, $domain = 'default' ) {
 	 * @param string $translation Translated text.
 	 * @param string $single      The text to be used if the number is singular.
 	 * @param string $plural      The text to be used if the number is plural.
-	 * @param int    $number      The number to compare against to use either the singular or plural form.
+	 * @param string $number      The number to compare against to use either the singular or plural form.
 	 * @param string $context     Context information for the translators.
 	 * @param string $domain      Text domain. Unique identifier for retrieving translated strings.
 	 */
@@ -589,12 +587,12 @@ function _nx( $single, $plural, $number, $context, $domain = 'default' ) {
  * @return array {
  *     Array of translation information for the strings.
  *
- *     @type string      $0        Singular form to be localized. No longer used.
- *     @type string      $1        Plural form to be localized. No longer used.
- *     @type string      $singular Singular form to be localized.
- *     @type string      $plural   Plural form to be localized.
- *     @type null        $context  Context information for the translators.
- *     @type string|null $domain   Text domain.
+ *     @type string $0        Singular form to be localized. No longer used.
+ *     @type string $1        Plural form to be localized. No longer used.
+ *     @type string $singular Singular form to be localized.
+ *     @type string $plural   Plural form to be localized.
+ *     @type null   $context  Context information for the translators.
+ *     @type string $domain   Text domain.
  * }
  */
 function _n_noop( $singular, $plural, $domain = null ) {
@@ -656,7 +654,7 @@ function _nx_noop( $singular, $plural, $context, $domain = null ) {
 }
 
 /**
- * Translates and returns the singular or plural form of a string that's been registered
+ * Translates and retrieves the singular or plural form of a string that's been registered
  * with _n_noop() or _nx_noop().
  *
  * Used when you want to use a translatable plural string once the number is known.
@@ -669,18 +667,11 @@ function _nx_noop( $singular, $plural, $context, $domain = null ) {
  *
  * @since 3.1.0
  *
- * @param array  $nooped_plural {
- *     Array that is usually a return value from _n_noop() or _nx_noop().
- *
- *     @type string      $singular Singular form to be localized.
- *     @type string      $plural   Plural form to be localized.
- *     @type string|null $context  Context information for the translators.
- *     @type string|null $domain   Text domain.
- * }
+ * @param array  $nooped_plural Array with singular, plural, and context keys, usually the result of _n_noop() or _nx_noop().
  * @param int    $count         Number of objects.
  * @param string $domain        Optional. Text domain. Unique identifier for retrieving translated strings. If $nooped_plural contains
  *                              a text domain passed to _n_noop() or _nx_noop(), it will override this value. Default 'default'.
- * @return string Either $singular or $plural translated text.
+ * @return string Either $single or $plural translated text.
  */
 function translate_nooped_plural( $nooped_plural, $count, $domain = 'default' ) {
 	if ( $nooped_plural['domain'] ) {
@@ -695,7 +686,7 @@ function translate_nooped_plural( $nooped_plural, $count, $domain = 'default' ) 
 }
 
 /**
- * Loads a .mo file into the text domain $domain.
+ * Load a .mo file into the text domain $domain.
  *
  * If the text domain already exists, the translations will be merged. If both
  * sets have the same string, the translation from the original value will be taken.
@@ -775,7 +766,7 @@ function load_textdomain( $domain, $mofile ) {
 }
 
 /**
- * Unloads translations for a text domain.
+ * Unload translations for a text domain.
  *
  * @since 3.0.0
  *
@@ -827,7 +818,7 @@ function unload_textdomain( $domain ) {
 }
 
 /**
- * Loads default translated strings based on locale.
+ * Load default translated strings based on locale.
  *
  * Loads the .mo file in WP_LANG_DIR constant path from WordPress root.
  * The translated (.mo) file is named based on the locale.
@@ -913,7 +904,7 @@ function load_plugin_textdomain( $domain, $deprecated = false, $plugin_rel_path 
 }
 
 /**
- * Loads the translated strings for a plugin residing in the mu-plugins directory.
+ * Load the translated strings for a plugin residing in the mu-plugins directory.
  *
  * @since 3.0.0
  * @since 4.6.0 The function now tries to load the .mo file from the languages directory first.
@@ -940,7 +931,7 @@ function load_muplugin_textdomain( $domain, $mu_plugin_rel_path = '' ) {
 }
 
 /**
- * Loads the theme's translated strings.
+ * Load the theme's translated strings.
  *
  * If the current locale exists as a .mo file in the theme's root directory, it
  * will be included in the translated strings by the $domain.
@@ -981,7 +972,7 @@ function load_theme_textdomain( $domain, $path = false ) {
 }
 
 /**
- * Loads the child themes translated strings.
+ * Load the child themes translated strings.
  *
  * If the current locale exists as a .mo file in the child themes
  * root directory, it will be included in the translated strings by the $domain.
@@ -1308,7 +1299,7 @@ function _get_path_to_translation_from_lang_dir( $domain ) {
 }
 
 /**
- * Returns the Translations instance for a text domain.
+ * Return the Translations instance for a text domain.
  *
  * If there isn't one, returns empty Translations instance.
  *
@@ -1334,7 +1325,7 @@ function get_translations_for_domain( $domain ) {
 }
 
 /**
- * Determines whether there are translations for the text domain.
+ * Whether there are translations for the text domain.
  *
  * @since 3.0.0
  *
@@ -1373,7 +1364,7 @@ function translate_user_role( $name, $domain = 'default' ) {
 }
 
 /**
- * Gets all available languages based on the presence of *.mo files in a given directory.
+ * Get all available languages based on the presence of *.mo files in a given directory.
  *
  * The default directory is WP_LANG_DIR.
  *
@@ -1410,7 +1401,7 @@ function get_available_languages( $dir = null ) {
 }
 
 /**
- * Gets installed translations.
+ * Get installed translations.
  *
  * Looks in the wp-content/languages directory for translations of
  * plugins or themes.
@@ -1466,7 +1457,7 @@ function wp_get_installed_translations( $type ) {
 }
 
 /**
- * Extracts headers from a PO file.
+ * Extract headers from a PO file.
  *
  * @since 3.7.0
  *
@@ -1491,7 +1482,7 @@ function wp_get_pomo_file_data( $po_file ) {
 }
 
 /**
- * Displays or returns a Language selector.
+ * Language selector.
  *
  * @since 4.0.0
  * @since 4.3.0 Introduced the `echo` argument.
@@ -1721,7 +1712,7 @@ function restore_current_locale() {
 }
 
 /**
- * Determines whether switch_to_locale() is in effect.
+ * Whether switch_to_locale() is in effect.
  *
  * @since 4.7.0
  *

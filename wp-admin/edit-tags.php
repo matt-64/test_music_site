@@ -160,7 +160,7 @@ switch ( $wp_list_table->current_action() ) {
 			wp_die( __( 'You attempted to edit an item that does not exist. Perhaps it was deleted?' ) );
 		}
 
-		wp_redirect( sanitize_url( get_edit_term_link( $term_id, $taxonomy, $post_type ) ) );
+		wp_redirect( esc_url_raw( get_edit_term_link( $term_id, $taxonomy, $post_type ) ) );
 		exit;
 
 	case 'editedtag':
@@ -486,7 +486,7 @@ if ( $can_edit_terms ) {
 		 * @param array  $dropdown_args {
 		 *     An array of taxonomy parent drop-down arguments.
 		 *
-		 *     @type int|bool $hide_empty       Whether to hide terms not attached to any posts. Default 0.
+		 *     @type int|bool $hide_empty       Whether to hide terms not attached to any posts. Default 0|false.
 		 *     @type bool     $hide_if_empty    Whether to hide the drop-down if no terms exist. Default false.
 		 *     @type string   $taxonomy         The taxonomy slug.
 		 *     @type string   $name             Value of the name attribute to use for the drop-down select element.
